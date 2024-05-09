@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import torch
+import warnings
 
+warnings.filterwarnings(action='ignore')
 
 def point_form(boxes):
     """ Convert prior_boxes to (xmin, ymin, xmax, ymax)

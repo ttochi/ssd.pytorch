@@ -10,7 +10,17 @@ class Detect(Function):
     scores and threshold to a top_k number of output predictions for both
     confidence score and locations.
     """
-    def __init__(self, num_classes, bkg_label, top_k, conf_thresh, nms_thresh):
+    @staticmethod
+    def forward(self, num_classes, bkg_label, top_k, conf_thresh, nms_thresh, loc_data, conf_data, prior_data):
+        """
+        Args:
+            loc_data: (tensor) Loc preds from loc layers
+                Shape: [batch,num_priors*4]
+            conf_data: (tensor) Shape: Conf preds from conf layers
+                Shape: [batch*num_priors,num_classes]
+            prior_data: (tensor) Prior boxes and variances from priorbox layers
+                Shape: [1,num_priors,4]
+        """
         self.num_classes = num_classes
         self.background_label = bkg_label
         self.top_k = top_k
@@ -21,16 +31,6 @@ class Detect(Function):
         self.conf_thresh = conf_thresh
         self.variance = cfg['variance']
 
-    def forward(self, loc_data, conf_data, prior_data):
-        """
-        Args:
-            loc_data: (tensor) Loc preds from loc layers
-                Shape: [batch,num_priors*4]
-            conf_data: (tensor) Shape: Conf preds from conf layers
-                Shape: [batch*num_priors,num_classes]
-            prior_data: (tensor) Prior boxes and variances from priorbox layers
-                Shape: [1,num_priors,4]
-        """
         num = loc_data.size(0)  # batch size
         num_priors = prior_data.size(0)
         output = torch.zeros(num, self.num_classes, self.top_k, 5)
